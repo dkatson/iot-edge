@@ -1,8 +1,0 @@
-{
-"links": [
-    {
-      "source": "dotnet_sensor_module",
-      "sink": "dotnet_printer_module"
-    }
-  ]
-}
