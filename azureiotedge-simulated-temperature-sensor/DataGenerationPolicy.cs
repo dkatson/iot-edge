@@ -20,6 +20,7 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
             HumidityPercentMin = 24;
             HumidityPercentMax = 27;
             _normal = (MachinePressureMax - MachinePressureMin) / (MachineTemperatureMax - MachineTemperatureMin);
+            RunTimeSinceProductionMin = 5000;
         }
 
         public double MachineTemperatureMin { get; private set; }
@@ -29,6 +30,7 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
         public double AmbientTemperature { get; private set; }
         public int HumidityPercentMin { get; private set; }
         public int HumidityPercentMax { get; set; }
+        public int RunTimeSinceProductionMin { get; private set; }
 
         public double CalculateMachineTemperature(double? currentTemperature = null)
         {
@@ -57,6 +59,13 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
         public int CalculateHumidity()
         {
             return rnd.Next(HumidityPercentMin, HumidityPercentMax);
+        }
+        
+        public int CalculateRunTimeSinceProduction(int? currentRunTime)
+        {
+            var current = currentRunTime ?? RunTimeSinceProductionMin;
+            current += rnd.Next(2,5);
+            return current ;
         }
     }
 }

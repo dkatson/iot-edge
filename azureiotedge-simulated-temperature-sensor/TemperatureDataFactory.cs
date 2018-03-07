@@ -9,6 +9,7 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
     {
         private static readonly Random rand = new Random();
         private static double CurrentMachineTemperature;
+        private static int CurrentRunTimeSinceProduction;
 
         public static MessageBody CreateTemperatureData(int counter, DataGenerationPolicy policy, bool reset = false)
         {
@@ -25,13 +26,19 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
             var machinePressure = policy.CalculatePressure(TemperatureDataFactory.CurrentMachineTemperature);
             var ambientTemperature = policy.CalculateAmbientTemperature();
             var ambientHumidity = policy.CalculateHumidity();
+            var machineRunTimeSinceProduction = policy.CalculateRunTimeSinceProduction(TemperatureDataFactory.CurrentRunTimeSinceProduction);
+            //var machineRunTimeSinceMaintenance = policy.CalculateRunTimeSinceMaintenance();
+            //var machineRunTimeSinceOverhaul = policy.CalculateRunTimeSinceOverhaul();
 
             var messageBody = new MessageBody
             {
                 Machine = new Machine
                 {
                     Temperature = TemperatureDataFactory.CurrentMachineTemperature,
-                    Pressure =  machinePressure
+                    Pressure =  machinePressure,
+                    RunTimeSinceProduction = machineRunTimeSinceProduction,
+                    //RunTimeSinceMaintenance = machineRunTimeSinceMaintenance,
+                    //RunTimeSinceOverhaul = machineRunTimeSinceOverhaul,
                 },
                 Ambient = new Ambient
                 {
