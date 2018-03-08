@@ -10,6 +10,8 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
         private static readonly Random rand = new Random();
         private static double CurrentMachineTemperature;
         private static int CurrentRunTimeSinceProduction;
+        private static int CurrentRunTimeSinceMaintenance;
+        private static int CurrentRunTimeSinceOverhaul;
 
         public static MessageBody CreateTemperatureData(int counter, DataGenerationPolicy policy, bool reset = false)
         {
@@ -26,9 +28,9 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
             var machinePressure = policy.CalculatePressure(TemperatureDataFactory.CurrentMachineTemperature);
             var ambientTemperature = policy.CalculateAmbientTemperature();
             var ambientHumidity = policy.CalculateHumidity();
-            var machineRunTimeSinceProduction = policy.CalculateRunTimeSinceProduction(TemperatureDataFactory.CurrentRunTimeSinceProduction);
-            //var machineRunTimeSinceMaintenance = policy.CalculateRunTimeSinceMaintenance();
-            //var machineRunTimeSinceOverhaul = policy.CalculateRunTimeSinceOverhaul();
+            TemperatureDataFactory.CurrentRunTimeSinceProduction = policy.CalculateRunTimeSinceProduction(TemperatureDataFactory.CurrentRunTimeSinceProduction);
+            TemperatureDataFactory.CurrentRunTimeSinceMaintenance = policy.CalculateRunTimeSinceMaintenance(TemperatureDataFactory.CurrentRunTimeSinceMaintenance);
+            TemperatureDataFactory.CurrentRunTimeSinceOverhaul = policy.CalculateRunTimeSinceOverhaul(TemperatureDataFactory.CurrentRunTimeSinceOverhaul);
 
             var messageBody = new MessageBody
             {
@@ -36,9 +38,9 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
                 {
                     Temperature = TemperatureDataFactory.CurrentMachineTemperature,
                     Pressure =  machinePressure,
-                    RunTimeSinceProduction = machineRunTimeSinceProduction,
-                    //RunTimeSinceMaintenance = machineRunTimeSinceMaintenance,
-                    //RunTimeSinceOverhaul = machineRunTimeSinceOverhaul,
+                    RunTimeSinceProduction = TemperatureDataFactory.CurrentRunTimeSinceProduction,
+                    RunTimeSinceMaintenance = TemperatureDataFactory.CurrentRunTimeSinceMaintenance,
+                    RunTimeSinceOverhaul = TemperatureDataFactory.CurrentRunTimeSinceOverhaul,
                 },
                 Ambient = new Ambient
                 {

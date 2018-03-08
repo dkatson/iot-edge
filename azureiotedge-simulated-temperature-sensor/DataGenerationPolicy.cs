@@ -21,6 +21,8 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
             HumidityPercentMax = 27;
             _normal = (MachinePressureMax - MachinePressureMin) / (MachineTemperatureMax - MachineTemperatureMin);
             RunTimeSinceProductionMin = 5000;
+            FirstMaintenance = 3000;
+            FirstOverhaul = 4000;
         }
 
         public double MachineTemperatureMin { get; private set; }
@@ -31,6 +33,8 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
         public int HumidityPercentMin { get; private set; }
         public int HumidityPercentMax { get; set; }
         public int RunTimeSinceProductionMin { get; private set; }
+        public int FirstMaintenance {get; private set; }
+        public int FirstOverhaul {get; private set;}
 
         public double CalculateMachineTemperature(double? currentTemperature = null)
         {
@@ -64,8 +68,28 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
         public int CalculateRunTimeSinceProduction(int? currentRunTime)
         {
             var current = currentRunTime ?? RunTimeSinceProductionMin;
-            current += rnd.Next(2,5);
+            current += rnd.Next(3,15); //add value between [3..15]
             return current ;
+        }
+        public int CalculateRunTimeSinceMaintenance(int? currentRunTimeFromLastMaintenance)
+        {
+            var current = currentRunTimeFromLastMaintenance ?? FirstMaintenance;
+            if (current - FirstMaintenance > 3000) 
+            {
+                current += rnd.Next(3,15); //add value between [3..15]
+            }
+            else
+            {
+                currentRunTimeFromLastMaintenance = 0;
+                current = rnd.Next(3,15);
+            }
+            return current;
+        }
+
+        public int CalculateRunTimeSinceOverhaul(int? currenctRunTimeFromLastOverhaul)
+        {
+            var current = currenctRunTimeFromLastOverhaul ?? FirstOverhaul;
+            return current += rnd.Next(3,15);
         }
     }
 }
