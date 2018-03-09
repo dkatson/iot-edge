@@ -65,28 +65,27 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
             return rnd.Next(HumidityPercentMin, HumidityPercentMax);
         }
         
-        public int CalculateRunTimeSinceProduction(int? currentRunTime)
+        public int CalculateRunTimeSinceProduction(int? currentRunTime = null)
         {
             var current = currentRunTime ?? RunTimeSinceProductionMin;
             current += rnd.Next(3,15); //add value between [3..15]
             return current ;
         }
-        public int CalculateRunTimeSinceMaintenance(int? currentRunTimeFromLastMaintenance)
+        public int CalculateRunTimeSinceMaintenance(int? currentRunTimeFromLastMaintenance = null)
         {
             var current = currentRunTimeFromLastMaintenance ?? FirstMaintenance;
-            if (current - FirstMaintenance > 3000) 
+            if (current - FirstMaintenance < 3000) 
             {
                 current += rnd.Next(3,15); //add value between [3..15]
             }
             else
-            {
-                currentRunTimeFromLastMaintenance = 0;
-                current = rnd.Next(3,15);
+            { 
+                current = 0;
             }
             return current;
         }
 
-        public int CalculateRunTimeSinceOverhaul(int? currenctRunTimeFromLastOverhaul)
+        public int CalculateRunTimeSinceOverhaul(int? currenctRunTimeFromLastOverhaul = null)
         {
             var current = currenctRunTimeFromLastOverhaul ?? FirstOverhaul;
             return current += rnd.Next(3,15);
