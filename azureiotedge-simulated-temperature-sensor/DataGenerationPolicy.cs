@@ -20,9 +20,6 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
             HumidityPercentMin = 24;
             HumidityPercentMax = 27;
             _normal = (MachinePressureMax - MachinePressureMin) / (MachineTemperatureMax - MachineTemperatureMin);
-            RunTimeSinceProductionMin = 5000;
-            FirstMaintenance = 3000;
-            FirstOverhaul = 4000;
         }
 
         public double MachineTemperatureMin { get; private set; }
@@ -32,9 +29,10 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
         public double AmbientTemperature { get; private set; }
         public int HumidityPercentMin { get; private set; }
         public int HumidityPercentMax { get; set; }
-        public int RunTimeSinceProductionMin { get; private set; }
-        public int FirstMaintenance {get; private set; }
-        public int FirstOverhaul {get; private set;}
+        public int RunTimeSinceProductionMin { get; private set; } = 5000;
+        public int FirstMaintenance {get; private set; } = 3110;
+        public int FirstOverhaul {get; private set;} = 4220;
+        public int RunTimeRandomValue = rnd.Next(3,15);
 
         public double CalculateMachineTemperature(double? currentTemperature = null)
         {
@@ -65,30 +63,43 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
             return rnd.Next(HumidityPercentMin, HumidityPercentMax);
         }
         
-        public int CalculateRunTimeSinceProduction(int? currentRunTime = null)
+        public int CalculateRunTimeSinceProduction(int currentRunTime)
         {
-            var current = currentRunTime ?? RunTimeSinceProductionMin;
-            current += rnd.Next(3,15); //add value between [3..15]
-            return current ;
+            var current = currentRunTime;
+            if (current == 0)
+            {
+                current = RunTimeSinceProductionMin;
+            }
+            
+            return current += RunTimeRandomValue; //add value between [3..15]
         }
-        public int CalculateRunTimeSinceMaintenance(int? currentRunTimeFromLastMaintenance = null)
+        public int CalculateRunTimeSinceMaintenance(int currentRunTimeFromLastMaintenance)
         {
-            var current = currentRunTimeFromLastMaintenance ?? FirstMaintenance;
+            var current = currentRunTimeFromLastMaintenance;
+            if (current == 0)
+            {
+                current = FirstMaintenance;
+            }
+            
             if (current - FirstMaintenance < 3000) 
             {
-                current += rnd.Next(3,15); //add value between [3..15]
+                current += RunTimeRandomValue; //add value between [3..15]
             }
             else
             { 
-                current = 0;
+                current = 1;
             }
             return current;
         }
 
-        public int CalculateRunTimeSinceOverhaul(int? currenctRunTimeFromLastOverhaul = null)
+        public int CalculateRunTimeSinceOverhaul(int currenctRunTimeFromLastOverhaul)
         {
-            var current = currenctRunTimeFromLastOverhaul ?? FirstOverhaul;
-            return current += rnd.Next(3,15);
+            var current = currenctRunTimeFromLastOverhaul;
+            if (current == 0)
+            {
+                current = FirstOverhaul;
+            }
+            return current += RunTimeRandomValue;
         }
     }
 }

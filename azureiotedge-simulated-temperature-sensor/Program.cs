@@ -29,7 +29,8 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
         private static volatile DesiredPropertiesData desiredPropertiesData;
         private static DataGenerationPolicy generationPolicy = new DataGenerationPolicy();
 
-        private static volatile bool IsReset = false;
+        private static volatile bool IsResetTemperature = false;
+        private static volatile bool IsResetOverhaule = false;
 
         static async Task Main(string[] args)
         {
@@ -113,7 +114,9 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
             await ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(OnDesiredPropertiesUpdate, null);
 
             // this direct method will allow to reset the temperature sensor values back to their initial state
-            await ioTHubModuleClient.SetMethodHandlerAsync("reset", ResetMethod, null);
+            await ioTHubModuleClient.SetMethodHandlerAsync("reset", ResetTemperatureMethod, null);
+
+            await ioTHubModuleClient.SetMethodHandlerAsync("overhaul", ResetOverhaulMethod, null);
 
             // we don't pass ioTHubModuleClient as we're not sending any messages out to the message bus
             await ioTHubModuleClient.SetInputMessageHandlerAsync("control", ControlMessageHandler, null);
@@ -134,11 +137,11 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
                         if(counter == 1)
                         {
                             // first time execution needs to reset the data factory
-                            IsReset = true;
+                            IsResetTemperature = true;
                         }
 
-                        var messageBody = TemperatureDataFactory.CreateTemperatureData(counter, generationPolicy, IsReset);
-                        IsReset = false;
+                        var messageBody = TemperatureDataFactory.CreateTemperatureData(counter, generationPolicy, IsResetTemperature, IsResetOverhaule);
+                        IsResetTemperature = false;
                         var messageString = JsonConvert.SerializeObject(messageBody);
                         var messageBytes = Encoding.UTF8.GetBytes(messageString);
                         var message = new Message(messageBytes);
@@ -165,14 +168,24 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
         }
 
 
-        private static Task<MethodResponse> ResetMethod(MethodRequest request, object userContext)
+        private static Task<MethodResponse> ResetTemperatureMethod(MethodRequest request, object userContext)
         {
             var response = new MethodResponse((int) HttpStatusCode.OK);
-            Console.WriteLine("Received reset command via direct method invocation");
+            Console.WriteLine("Received reset temperature command via direct method invocation");
             Console.WriteLine("Resetting temperature sensor...");
-            IsReset = true;
+            IsResetTemperature = true;
             return Task.FromResult(response);
         }
+
+        private static Task<MethodResponse> ResetOverhaulMethod(MethodRequest request, object userContext)
+        {
+            var response = new MethodResponse((int) HttpStatusCode.OK);
+            Console.WriteLine("Received reset overhaul command via direct method invocation");
+            Console.WriteLine("Resetting overhaul...");
+            IsResetOverhaule = true;
+            return Task.FromResult(response);
+        }
+
 
         private static Task<MessageResponse> ControlMessageHandler(Message message, object userContext)
         {
@@ -189,7 +202,7 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
                     if (messageBody.Command == ControlCommandEnum.Reset)
                     {
                         Console.WriteLine("Resetting temperature sensor..");
-                        IsReset = true;
+                        IsResetTemperature = true;
                     }
                     else
                     {

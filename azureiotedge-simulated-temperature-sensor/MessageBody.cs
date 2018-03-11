@@ -22,11 +22,11 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
         public double Temperature { get; set; }
         [JsonProperty("pressure")]
         public double Pressure { get; set; }
-        [JsonProperty("runTimeSinceProduction")]
+        [JsonProperty("run-Time-Since-Production")]
         public double RunTimeSinceProduction { get; set; }
-        [JsonProperty("runTimeSinceMaintenance")]
+        [JsonProperty("run-Time-Since-Maintenance")]
         public double RunTimeSinceMaintenance { get; set; }
-        [JsonProperty("runTimeSinceOverhaul")]
+        [JsonProperty("run-Time-Since-Overhaul")]
         public double RunTimeSinceOverhaul { get; set; }
 
     }

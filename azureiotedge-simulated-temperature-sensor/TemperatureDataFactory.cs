@@ -13,9 +13,9 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
         private static int CurrentRunTimeSinceMaintenance;
         private static int CurrentRunTimeSinceOverhaul;
 
-        public static MessageBody CreateTemperatureData(int counter, DataGenerationPolicy policy, bool reset = false)
+        public static MessageBody CreateTemperatureData(int counter, DataGenerationPolicy policy, bool resetTemperature = false, bool resetOverhaul = false)
         {
-            if(reset)
+            if(resetTemperature)
             {
                 TemperatureDataFactory.CurrentMachineTemperature = policy.CalculateMachineTemperature();
             }
@@ -30,7 +30,16 @@ namespace AzureIotEdgeSimulatedTemperatureSensor
             var ambientHumidity = policy.CalculateHumidity();
             TemperatureDataFactory.CurrentRunTimeSinceProduction = policy.CalculateRunTimeSinceProduction(TemperatureDataFactory.CurrentRunTimeSinceProduction);
             TemperatureDataFactory.CurrentRunTimeSinceMaintenance = policy.CalculateRunTimeSinceMaintenance(TemperatureDataFactory.CurrentRunTimeSinceMaintenance);
-            TemperatureDataFactory.CurrentRunTimeSinceOverhaul = policy.CalculateRunTimeSinceOverhaul(TemperatureDataFactory.CurrentRunTimeSinceOverhaul);
+            
+            if (resetOverhaul)
+            {
+                TemperatureDataFactory.CurrentRunTimeSinceOverhaul = policy.CalculateRunTimeSinceOverhaul(1);
+            }
+            else
+            {
+                TemperatureDataFactory.CurrentRunTimeSinceOverhaul = 
+                    policy.CalculateRunTimeSinceOverhaul(TemperatureDataFactory.CurrentRunTimeSinceOverhaul);
+            }
 
             var messageBody = new MessageBody
             {
